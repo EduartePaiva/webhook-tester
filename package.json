@@ -1,0 +1,21 @@
+{
+    "name": "webhook-tester",
+    "version": "1.0.0",
+    "main": "src/main.ts",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": "Eduarte",
+    "license": "ISC",
+    "description": "This is an attempt of building a server that help testing webhooks locally",
+    "dependencies": {
+        "express": "^4.19.2"
+    },
+    "devDependencies": {
+        "@types/express": "^4.17.21",
+        "typescript": "^5.5.2"
+    }
+}
