@@ -1,11 +1,14 @@
 {
     "name": "webhook-tester",
     "version": "1.0.0",
-    "main": "src/main.ts",
+    "main": "main.js",
     "private": true,
     "type": "module",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "tsc --build",
+        "start": "bun ./dist/main.js",
+        "dev": "bun --watch ./src/main.ts"
     },
     "keywords": [],
     "author": "Eduarte",
