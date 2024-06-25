@@ -15,10 +15,19 @@
     "license": "ISC",
     "description": "This is an attempt of building a server that help testing webhooks locally",
     "dependencies": {
-        "express": "^4.19.2"
+        "@electric-sql/pglite": "^0.1.5",
+        "drizzle-orm": "^0.31.2",
+        "express": "^4.19.2",
+        "socket.io": "^4.7.5"
     },
     "devDependencies": {
         "@types/express": "^4.17.21",
+        "drizzle-kit": "^0.22.7",
+        "prettier": "^3.3.2",
         "typescript": "^5.5.2"
+    },
+    "optionalDependencies": {
+        "bufferutil": "^4.0.8",
+        "utf-8-validate": "^6.0.4"
     }
 }
