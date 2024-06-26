@@ -105,5 +105,5 @@
         // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
         "skipLibCheck": true /* Skip type checking all .d.ts files. */
     },
-    "exclude": ["drizzle_schema/schema.ts", "./drizzle.config.ts"]
+    "exclude": ["src/db/drizzle_schema/schema.ts", "./drizzle.config.ts"]
 }
