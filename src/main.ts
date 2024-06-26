@@ -1,15 +1,24 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
+import "dotenv/config";
+import bcrypt from "bcrypt";
+import { postUser, validatePostUserMiddleware } from "./zod/zodSchemas";
 
 const PORT = 3000;
 const app = express();
 
-const posts = ["hello", "world"];
+app.use(express.json());
 
-app.get("/posts", (request, response) => {
-    response.json(posts);
-});
+if (process.env.ACCEPT_NEW_USERS !== undefined && process.env.ACCEPT_NEW_USERS === "yes") {
+    app.post(
+        "/users",
+        validatePostUserMiddleware,
+        (req: Request<any, any, postUser>, res: Response) => {
+            res.json(req.body.email);
+        },
+    );
+}
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
