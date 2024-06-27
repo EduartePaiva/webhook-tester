@@ -2,6 +2,8 @@
 [x] - setup a database locally with docker or other thing.
 [x] - create a users table.
 [x] - learn how to safely store passwords.
-[_] - create the api for creating a new user.
+[x] - create the api for creating a new user.
+[_] - rename auth related things to auth instead of users
 [_] - do email confirmation.
 [_] - setup authentication from scratch.
+[_] - setup loginUser with jwt authentication.

@@ -54,7 +54,7 @@ const loginUser = z.object({
 export type postUser = z.infer<typeof createUser>;
 export const validatePostUserMiddleware = (req: Request, res: Response, next: NextFunction) => {
     try {
-        createUser.parse(req.body);
+        res.req.body = createUser.parse(req.body);
         return next();
     } catch (error) {
         return res.status(400).json(error);
@@ -64,7 +64,7 @@ export const validatePostUserMiddleware = (req: Request, res: Response, next: Ne
 export type loginUser = z.infer<typeof loginUser>;
 export const validateLoginUserMiddleware = (req: Request, res: Response, next: NextFunction) => {
     try {
-        loginUser.parse(req.body);
+        res.req.body = loginUser.parse(req.body);
         return next();
     } catch (error) {
         return res.status(400).json(error);

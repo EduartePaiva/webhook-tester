@@ -4,6 +4,9 @@ import { loginUser as loginUserReqType, postUser } from "../zodMiddlewares/users
 import { db } from "../../db/drizzle_db";
 import { users } from "../../db/drizzle_schema/schema";
 import { eq } from "drizzle-orm";
+import jwt from "jsonwebtoken";
+
+const ONE_DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000;
 
 export const createUser = async (req: Request<any, any, postUser>, res: Response) => {
     try {
@@ -30,11 +33,46 @@ export const createUser = async (req: Request<any, any, postUser>, res: Response
         // todo, save user in the database and confirm user email
         res.status(201).json("user created");
     } catch (err) {
-        res.status(500).json("server error");
+        res.status(500).json(err);
     }
 };
 
+type accessTokenType = {
+    id: string;
+    email: string;
+    name: string;
+    expirationData: number;
+};
+
 export const loginUser = async (req: Request<any, any, loginUserReqType>, res: Response) => {
-    // use bcrypt.compare
-    // result = await bcrypt.compare(req.body.password, password_from_db)
+    // authorize user
+    const user = await db
+        .select({
+            id: users.id,
+            password: users.password,
+            userName: users.userName,
+        })
+        .from(users)
+        .where(eq(users.email, req.body.email));
+
+    if (user.length != 1) {
+        res.status(403).send("user don't exist");
+        return;
+    }
+    if (!(await bcrypt.compare(req.body.password, user[0].password))) {
+        res.status(401).send("unauthorized");
+        return;
+    }
+    // generate jwt token
+    const accessToken = jwt.sign(
+        {
+            id: user[0].id,
+            name: user[0].userName,
+            email: req.body.email,
+            expirationData: Date.now() + ONE_DAY_IN_MILLISECONDS,
+        } satisfies accessTokenType,
+        process.env.ACCESS_TOKEN_SECRET!,
+    );
+
+    res.status(201).json({ accessToken });
 };
