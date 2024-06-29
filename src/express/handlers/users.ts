@@ -45,34 +45,38 @@ type accessTokenType = {
 };
 
 export const loginUser = async (req: Request<any, any, loginUserReqType>, res: Response) => {
-    // authorize user
-    const user = await db
-        .select({
-            id: users.id,
-            password: users.password,
-            userName: users.userName,
-        })
-        .from(users)
-        .where(eq(users.email, req.body.email));
+    try {
+        // authorize user
+        const user = await db
+            .select({
+                id: users.id,
+                password: users.password,
+                userName: users.userName,
+            })
+            .from(users)
+            .where(eq(users.email, req.body.email));
 
-    if (user.length != 1) {
-        res.status(403).send("user don't exist");
-        return;
-    }
-    if (!(await bcrypt.compare(req.body.password, user[0].password))) {
-        res.status(401).send("unauthorized");
-        return;
-    }
-    // generate jwt token
-    const accessToken = jwt.sign(
-        {
-            id: user[0].id,
-            name: user[0].userName,
-            email: req.body.email,
-            expirationData: Date.now() + ONE_DAY_IN_MILLISECONDS,
-        } satisfies accessTokenType,
-        process.env.ACCESS_TOKEN_SECRET!,
-    );
+        if (user.length != 1) {
+            res.status(403).send("user don't exist");
+            return;
+        }
+        if (!(await bcrypt.compare(req.body.password, user[0].password))) {
+            res.status(401).send("unauthorized");
+            return;
+        }
+        // generate jwt token
+        const accessToken = jwt.sign(
+            {
+                id: user[0].id,
+                name: user[0].userName,
+                email: req.body.email,
+                expirationData: Date.now() + ONE_DAY_IN_MILLISECONDS,
+            } satisfies accessTokenType,
+            process.env.ACCESS_TOKEN_SECRET!,
+        );
 
-    res.status(201).json({ accessToken });
+        res.status(201).json({ accessToken });
+    } catch (err) {
+        return res.status(500).json(err);
+    }
 };
