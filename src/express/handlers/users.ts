@@ -37,7 +37,7 @@ export const createUser = async (req: Request<any, any, postUser>, res: Response
     }
 };
 
-type accessTokenType = {
+export type accessTokenType = {
     id: string;
     email: string;
     name: string;
