@@ -5,6 +5,7 @@ import { Server, Socket } from "socket.io";
 import app from "./express";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
 import { accessTokenType } from "./express/handlers/users";
+import { Request } from "express";
 
 const PORT = 3000;
 
@@ -46,15 +47,23 @@ io.use((socket, next) => {
     next();
 });
 
-app.post("/message/:userId", (req, res) => {
+app.post("/message/:userId*", (req: Request<{ userId: string; "0": string }>, res) => {
     console.log("something came here");
     console.log(LOGGED_USERS);
+    console.log(req.params);
+    // if (typeof req.params["0"] === "string") {
+    //     const moreParams = req.params["0"];
+
+    // }
     const userSocketId = LOGGED_USERS.get(req.params.userId);
     if (userSocketId === undefined) {
         return res.sendStatus(200);
     }
     console.log("sending webhook payload to: " + userSocketId);
-    io.to(userSocketId).emit("message", req.body);
+    io.to(userSocketId).emit("message", {
+        extra_url: req.params["0"],
+        payload: req.body,
+    });
     return res.sendStatus(200);
 });
 
