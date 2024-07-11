@@ -6,7 +6,7 @@
 [x] - account for lowercase and uppercase email from user.
 [x] - start creating the client
 [x] - start exploring socket.io api
-[_] - rename auth related things to auth instead of users
+[x] - rename auth related things to auth instead of users
 [_] - do email confirmation.
 [_] - setup authentication from scratch.
 [_] - setup loginUser with jwt authentication.
