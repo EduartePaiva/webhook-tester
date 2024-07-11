@@ -11,7 +11,7 @@ export const authenticateToken = (req: Request, res: Response) => {
         return res.sendStatus(401);
     }
     const realToken = token[1];
-    jwt.verify(realToken, process.env.ACCESS_TOKEN_SECRET!, (err, user) => {
+    jwt.verify(realToken, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
         if (err !== null) {
             console.log(err);
             return res.sendStatus(403);

@@ -1,60 +1,61 @@
-import jwt from "jsonwebtoken";
+// dot env need to be imported at the start of everything
 import "dotenv/config";
+//-----
+import jwt from "jsonwebtoken";
 import { createServer } from "http";
-import { Server, Socket } from "socket.io";
+import { Server } from "socket.io";
 import app from "./express";
-import { DefaultEventsMap } from "socket.io/dist/typed-events";
-import { accessTokenType } from "./express/handlers/users";
 import { Request } from "express";
+import { ClientToServerEvents, InterServerEvents, ServerToClientEvents, SocketData } from "./types";
+import { initEverything } from "./validateEnvVariables";
+
+initEverything();
 
 const PORT = 3000;
 
 const httpServer = createServer(app);
-const io = new Server(httpServer, {
-    /* options */
-});
-
-const LOGGED_USERS = new Map<string, string>();
-
-io.on(
-    "connection",
-    (socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, accessTokenType>) => {
-        // ...
-        console.log(socket.id);
-        const userId = socket.data.id;
-        LOGGED_USERS.set(userId, socket.id);
-        socket.on("disconnect", () => {
-            console.log("removing user from webhook");
-            LOGGED_USERS.delete(userId);
-        });
+const io = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>(
+    httpServer,
+    {
+        /* options */
     },
 );
 
+const LOGGED_USERS = new Map<string, string>();
+
+// socket.io middleware for retrieving data for authentication
 io.use((socket, next) => {
     const token = socket.handshake.auth.token;
     if (typeof token !== "string") {
         return next(new Error("undefined token"));
     }
     // get userID and store in the socket.data
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!, (err, data) => {
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, data) => {
         if (err !== null) {
             console.log(err);
             return next(new Error("invalid token"));
         }
         console.log(data);
-        socket.data = data;
+        console.log("USER VERIFIED");
+        socket.data = data as SocketData;
     });
     next();
+});
+
+io.on("connection", (socket) => {
+    console.log("CONNECTION NEW USER ON ID: " + socket.id);
+    const userId = socket.data.id;
+    LOGGED_USERS.set(userId, socket.id);
+    socket.on("disconnect", () => {
+        console.log("REMOVING USER FROM LOGGED_USERS: " + userId);
+        LOGGED_USERS.delete(userId);
+    });
 });
 
 app.post("/message/:userId*", (req: Request<{ userId: string; "0": string }>, res) => {
     console.log("something came here");
     console.log(LOGGED_USERS);
     console.log(req.params);
-    // if (typeof req.params["0"] === "string") {
-    //     const moreParams = req.params["0"];
-
-    // }
     const userSocketId = LOGGED_USERS.get(req.params.userId);
     if (userSocketId === undefined) {
         return res.sendStatus(200);
@@ -68,5 +69,5 @@ app.post("/message/:userId*", (req: Request<{ userId: string; "0": string }>, re
 });
 
 httpServer.listen(PORT, () => {
-    console.log("server is connected!");
+    console.log("server is running on localhost:" + PORT);
 });

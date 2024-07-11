@@ -15,7 +15,7 @@ export const createUser = async (req: Request<any, any, postUser>, res: Response
                 id: users.id,
             })
             .from(users)
-            .where(eq(users.email, req.body.email));
+            .where(eq(users.email, req.body.email.toLowerCase()));
         if (result.length !== 0) return res.status(403).json("email already in use");
 
         const salt = await bcrypt.genSalt();
@@ -24,7 +24,7 @@ export const createUser = async (req: Request<any, any, postUser>, res: Response
         const insert_res = await db
             .insert(users)
             .values({
-                email: req.body.email,
+                email: req.body.email.toLowerCase(),
                 userName: req.body.userName,
                 password: hashedPassword,
             })
@@ -54,7 +54,7 @@ export const loginUser = async (req: Request<any, any, loginUserReqType>, res: R
                 userName: users.userName,
             })
             .from(users)
-            .where(eq(users.email, req.body.email));
+            .where(eq(users.email, req.body.email.toLowerCase()));
 
         if (user.length != 1) {
             res.status(403).send("user don't exist");
@@ -69,10 +69,10 @@ export const loginUser = async (req: Request<any, any, loginUserReqType>, res: R
             {
                 id: user[0].id,
                 name: user[0].userName,
-                email: req.body.email,
+                email: req.body.email.toLowerCase(),
                 expirationData: Date.now() + ONE_DAY_IN_MILLISECONDS,
             } satisfies accessTokenType,
-            process.env.ACCESS_TOKEN_SECRET!,
+            process.env.ACCESS_TOKEN_SECRET,
         );
 
         res.status(201).json({ accessToken });

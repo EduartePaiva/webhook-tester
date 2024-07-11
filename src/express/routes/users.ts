@@ -5,11 +5,11 @@ import { authenticateToken } from "../auth";
 
 const usersRouter = Router();
 
-// api/users
+// /users
 if (process.env.ACCEPT_NEW_USERS === "yes") {
     usersRouter.post("/", validatePostUserMiddleware, createUser);
 }
-// api/users/login
+// /users/login
 usersRouter.post("/login", validateLoginUserMiddleware, loginUser);
 
 usersRouter.get("/test_auth", authenticateToken);

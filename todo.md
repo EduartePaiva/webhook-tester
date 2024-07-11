@@ -3,10 +3,12 @@
 [x] - create a users table.
 [x] - learn how to safely store passwords.
 [x] - create the api for creating a new user.
-[_] - account for lowercase and uppercase email from user.
+[x] - account for lowercase and uppercase email from user.
+[x] - start creating the client
+[x] - start exploring socket.io api
 [_] - rename auth related things to auth instead of users
 [_] - do email confirmation.
 [_] - setup authentication from scratch.
 [_] - setup loginUser with jwt authentication.
-[_] - start creating the client
-[_] - start exploring socket.io api
+[x] - make zod check env variables, creating a initEverything function.
+[_] - search how to publish this on a real server
