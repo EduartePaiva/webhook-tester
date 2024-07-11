@@ -1,7 +1,7 @@
 // dot env need to be imported at the start of everything
 import "dotenv/config";
 //-----
-import jwt from "jsonwebtoken";
+import jwt, { VerifyCallback } from "jsonwebtoken";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import app from "./express";
@@ -30,12 +30,18 @@ io.use((socket, next) => {
         return next(new Error("undefined token"));
     }
     // get userID and store in the socket.data
+
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, data) => {
         if (err !== null) {
             console.log(err);
             return next(new Error("invalid token"));
         }
-        console.log(data);
+        const typedData = data as SocketData;
+        if (Date.now() > typedData.expirationData) {
+            return next(new Error("token expired"));
+        }
+
+        console.log(typedData);
         console.log("USER VERIFIED");
         socket.data = data as SocketData;
     });

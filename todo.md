@@ -12,4 +12,5 @@
 [_] - setup authentication from scratch.
 [_] - setup loginUser with jwt authentication.
 [_] - search how to publish this on a real server.
-[_] - setup expiration date for auth.
+[x] - setup expiration date for auth.
+[_] - text if expiration works properly.
