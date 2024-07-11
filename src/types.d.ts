@@ -1,4 +1,4 @@
-import { accessTokenType } from "./express/handlers/auth";
+import { accessTokenType } from "./express/auth/handler";
 import { envSchemaType } from "./validateEnvVariables";
 
 export interface ServerToClientEvents {

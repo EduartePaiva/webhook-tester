@@ -7,8 +7,9 @@
 [x] - start creating the client
 [x] - start exploring socket.io api
 [x] - rename auth related things to auth instead of users
+[x] - make zod check env variables, creating a initEverything function.
 [_] - do email confirmation.
 [_] - setup authentication from scratch.
 [_] - setup loginUser with jwt authentication.
-[x] - make zod check env variables, creating a initEverything function.
-[_] - search how to publish this on a real server
+[_] - search how to publish this on a real server.
+[_] - setup expiration date for auth.

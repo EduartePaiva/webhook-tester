@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import { Request, Response } from "express";
-import { loginUser as loginUserReqType, postUser } from "../zodMiddlewares/users";
+import { loginUser as loginUserReqType, postUser } from "./zodMiddlewares";
 import { db } from "../../db/drizzle_db";
 import { users } from "../../db/drizzle_schema/schema";
 import { eq } from "drizzle-orm";
