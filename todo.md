@@ -13,4 +13,5 @@
 [_] - setup loginUser with jwt authentication.
 [_] - search how to publish this on a real server.
 [x] - setup expiration date for auth.
-[_] - text if expiration works properly.
+[x] - test if expiration works properly.
+[x] - make initEverything actually stop the app if it fails.

@@ -10,5 +10,10 @@ const envScheme = z.object({
 export type envSchemaType = z.infer<typeof envScheme>;
 
 export const initEverything = () => {
-    envScheme.parse(process.env);
+    try {
+        envScheme.parse(process.env);
+    } catch (err) {
+        console.error(err);
+        process.exit(1);
+    }
 };

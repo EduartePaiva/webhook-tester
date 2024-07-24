@@ -1,7 +1,7 @@
 // dot env need to be imported at the start of everything
 import "dotenv/config";
 //-----
-import jwt, { VerifyCallback } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import app from "./express";
