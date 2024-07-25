@@ -41,7 +41,6 @@ io.use((socket, next) => {
             return next(new Error("token expired"));
         }
 
-        console.log(typedData);
         console.log("USER VERIFIED");
         socket.data = data as SocketData;
     });

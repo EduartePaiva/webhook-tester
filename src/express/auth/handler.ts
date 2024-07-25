@@ -29,7 +29,6 @@ export const createUser = async (req: Request<any, any, postUser>, res: Response
                 password: hashedPassword,
             })
             .returning();
-        console.log(insert_res);
         // todo, save user in the database and confirm user email
         res.status(201).json("user created");
     } catch (err) {
