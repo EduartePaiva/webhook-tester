@@ -15,3 +15,4 @@
 [x] - setup expiration date for auth.
 [x] - test if expiration works properly.
 [x] - make initEverything actually stop the app if it fails.
+[_] - publish on a ec2 instance
