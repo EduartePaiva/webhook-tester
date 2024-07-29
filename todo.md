@@ -16,4 +16,4 @@
 [x] - test if expiration works properly.
 [x] - make initEverything actually stop the app if it fails.
 [_] - publish on a ec2 instance.
-[_] - create a real db to host the database. CockroachDB db
+[x] - create a real db to host the database. CockroachDB db
