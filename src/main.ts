@@ -3,7 +3,6 @@ import { config } from "dotenv";
 
 //this is for pm2
 import path from "path";
-console.log(path.join(__dirname, ".env"));
 config({ path: path.join(__dirname, ".env") });
 
 //-----
