@@ -1,5 +1,11 @@
 // dot env need to be imported at the start of everything
-import "dotenv/config";
+import { config } from "dotenv";
+
+//this is for pm2
+import path from "path";
+console.log(path.join(__dirname, ".env"));
+config({ path: path.join(__dirname, ".env") });
+
 //-----
 import jwt from "jsonwebtoken";
 import { createServer } from "http";
