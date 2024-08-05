@@ -63,9 +63,6 @@ io.on("connection", (socket) => {
 });
 
 app.post("/message/:userId*", (req: Request<{ userId: string; "0": string }>, res) => {
-    console.log("something came here");
-    console.log(LOGGED_USERS);
-    console.log(req.params);
     const userSocketId = LOGGED_USERS.get(req.params.userId);
     if (userSocketId === undefined) {
         return res.sendStatus(200);

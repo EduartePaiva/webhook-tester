@@ -73,8 +73,9 @@ export const loginUser = async (req: Request<any, any, loginUserReqType>, res: R
             } satisfies accessTokenType,
             process.env.ACCESS_TOKEN_SECRET,
         );
-
-        res.status(201).json({ accessToken });
+        // todo hard coded url
+        const webhookURL = `https://webhook.eduartepaiva.com/${user[0].id}`;
+        res.status(201).json({ accessToken, webhookURL });
     } catch (err) {
         return res.status(500).json(err);
     }
