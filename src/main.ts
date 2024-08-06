@@ -23,6 +23,7 @@ const io = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEve
     httpServer,
     {
         /* options */
+        path: "/api/socket.io/",
     },
 );
 
@@ -62,7 +63,7 @@ io.on("connection", (socket) => {
     });
 });
 
-app.post("/message/:userId*", (req: Request<{ userId: string; "0": string }>, res) => {
+app.post("/api/message/:userId*", (req: Request<{ userId: string; "0": string }>, res) => {
     const userSocketId = LOGGED_USERS.get(req.params.userId);
     if (userSocketId === undefined) {
         return res.sendStatus(200);
