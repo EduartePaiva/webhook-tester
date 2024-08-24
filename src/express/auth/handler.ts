@@ -75,7 +75,7 @@ export const loginUser = async (req: Request<any, any, loginUserReqType>, res: R
         );
         // todo hard coded url
         const webhookURL = `https://webhook.eduartepaiva.com/${user[0].id}`;
-        res.status(201).json({ accessToken, webhookURL });
+        res.status(201).json({ accessToken, webhookURL, userName: user[0].userName });
     } catch (err) {
         return res.status(500).json(err);
     }
