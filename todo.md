@@ -11,9 +11,9 @@
 [_] - do email confirmation.
 [_] - setup authentication from scratch.
 [_] - setup loginUser with jwt authentication.
-[_] - search how to publish this on a real server.
+[x] - search how to publish this on a real server.
 [x] - setup expiration date for auth.
 [x] - test if expiration works properly.
 [x] - make initEverything actually stop the app if it fails.
-[_] - publish on a ec2 instance.
+[x] - publish on a ec2 instance.
 [x] - create a real db to host the database. CockroachDB db

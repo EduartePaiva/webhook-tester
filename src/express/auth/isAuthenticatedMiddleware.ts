@@ -22,7 +22,7 @@ function authenticate(req: Request, res: Response, next: NextFunction) {
             return next(new Error("invalid token"));
         }
         const typedData = data as SocketData;
-        if (Date.now() > typedData.expirationData) {
+        if (Date.now() > typedData.expirationDate) {
             return next(new Error("token expired"));
         }
         req.body.user = data as SocketData;

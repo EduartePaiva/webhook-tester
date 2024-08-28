@@ -40,7 +40,7 @@ export type accessTokenType = {
     id: string;
     email: string;
     name: string;
-    expirationData: number;
+    expirationDate: number;
 };
 
 export const loginUser = async (req: Request<any, any, loginUserReqType>, res: Response) => {
@@ -54,28 +54,30 @@ export const loginUser = async (req: Request<any, any, loginUserReqType>, res: R
             })
             .from(users)
             .where(eq(users.email, req.body.email.toLowerCase()));
-
-        if (user.length != 1) {
-            res.status(403).send("user don't exist");
-            return;
-        }
-        if (!(await bcrypt.compare(req.body.password, user[0].password))) {
-            res.status(401).send("unauthorized");
+        if (user.length != 1 || !(await bcrypt.compare(req.body.password, user[0].password))) {
+            res.status(401).send("Invalid email or password");
             return;
         }
         // generate jwt token
+        const expirationDate = Date.now() + ONE_DAY_IN_MILLISECONDS;
+
         const accessToken = jwt.sign(
             {
                 id: user[0].id,
                 name: user[0].userName,
                 email: req.body.email.toLowerCase(),
-                expirationData: Date.now() + ONE_DAY_IN_MILLISECONDS,
+                expirationDate,
             } satisfies accessTokenType,
             process.env.ACCESS_TOKEN_SECRET,
         );
         // todo hard coded url
         const webhookURL = `https://webhook.eduartepaiva.com/${user[0].id}`;
-        res.status(201).json({ accessToken, webhookURL, userName: user[0].userName });
+        res.status(201).json({
+            accessToken,
+            webhookURL,
+            userName: user[0].userName,
+            expirationDate,
+        });
     } catch (err) {
         return res.status(500).json(err);
     }

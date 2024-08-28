@@ -43,7 +43,7 @@ io.use((socket, next) => {
             return next(new Error("invalid token"));
         }
         const typedData = data as SocketData;
-        if (Date.now() > typedData.expirationData) {
+        if (Date.now() > typedData.expirationDate) {
             return next(new Error("token expired"));
         }
 
