@@ -51,6 +51,19 @@ const loginUser = z.object({
     password: z.string(),
 });
 
+const handleUserEmail = z.object({
+    email: z.string().email("invalid email"),
+});
+export type HandleUserEmail = z.infer<typeof handleUserEmail>;
+export const handleUserEmailMiddleware = (req: Request, res: Response, next: NextFunction) => {
+    try {
+        res.req.body = handleUserEmail.parse(req.body);
+        return next();
+    } catch (error) {
+        return res.status(400).json(error);
+    }
+};
+
 export type postUser = z.infer<typeof createUser>;
 export const validatePostUserMiddleware = (req: Request, res: Response, next: NextFunction) => {
     try {

@@ -1,12 +1,14 @@
 import bcrypt from "bcrypt";
 import { Request, Response } from "express";
-import { loginUser as loginUserReqType, postUser } from "./zodMiddlewares";
+import { HandleUserEmail, loginUser as loginUserReqType, postUser } from "./zodMiddlewares";
 import { db } from "../../db/drizzle_db";
 import { users } from "../../db/drizzle_schema/schema";
 import { eq } from "drizzle-orm";
 import jwt from "jsonwebtoken";
+import { generateEmailTemplate } from "./emailTemplate";
 
 const ONE_DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000;
+const ONE_DAY_IN_SECONDS = 24 * 60 * 60;
 
 export const createUser = async (req: Request<any, any, postUser>, res: Response) => {
     try {
@@ -81,4 +83,21 @@ export const loginUser = async (req: Request<any, any, loginUserReqType>, res: R
     } catch (err) {
         return res.status(500).json(err);
     }
+};
+
+export const handleEmailSent = (req: Request<any, any, HandleUserEmail>, res: Response) => {
+    // req.body.email
+    // what do I have to do here?
+    // cryptograph the email and a secret
+    // create a link like: https://webhook.eduartepaiva.com/create-user?token=cryptedemail
+    // in the frontend the user will access this link and
+    const emailToken = jwt.sign(
+        {
+            email: req.body.email,
+        } satisfies HandleUserEmail,
+        process.env.EMAIL_TOKEN_SECRET,
+        { expiresIn: ONE_DAY_IN_SECONDS },
+    );
+    const emailHtml = generateEmailTemplate(emailToken);
+    // now I need to send this email using resend
 };
