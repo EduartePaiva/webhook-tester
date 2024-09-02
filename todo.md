@@ -17,3 +17,5 @@
 [x] - make initEverything actually stop the app if it fails.
 [x] - publish on a ec2 instance.
 [x] - create a real db to host the database. CockroachDB db
+[_] - test if the email will be sent.
+[_] - remake the create user logic, it'll receive a jwt token that it's the email, the password and username and then will decrypt the token and create a user if the token is valid, it have to check if user is already created too.

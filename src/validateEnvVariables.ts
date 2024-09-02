@@ -5,6 +5,7 @@ const envScheme = z.object({
     ACCEPT_NEW_USERS: z.string(),
     ACCESS_TOKEN_SECRET: z.string().min(1),
     EMAIL_TOKEN_SECRET: z.string().min(1),
+    RESEND_API_TOKEN: z.string().min(1),
 });
 
 export type envSchemaType = z.infer<typeof envScheme>;
