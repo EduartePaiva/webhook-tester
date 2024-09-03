@@ -12,6 +12,7 @@ import { eq } from "drizzle-orm";
 import jwt from "jsonwebtoken";
 import { generateEmailTemplate } from "./emailTemplate";
 import { Resend } from "resend";
+import { getErrorMessage } from "../../lib/utils";
 
 const ONE_DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000;
 const ONE_DAY_IN_SECONDS = 24 * 60 * 60;
@@ -23,7 +24,7 @@ export const createUser = async (req: Request<any, any, postUser>, res: Response
             jwt.verify(req.body.token, process.env.EMAIL_TOKEN_SECRET),
         );
         if (!emailResult.success) {
-            return res.sendStatus(400).json({ error: emailResult.error.message });
+            return res.status(400).json({ error: emailResult.error.message });
         }
         const email = emailResult.data.email.toLowerCase();
         const result = await db
@@ -32,7 +33,9 @@ export const createUser = async (req: Request<any, any, postUser>, res: Response
             })
             .from(users)
             .where(eq(users.email, email));
-        if (result.length !== 0) return res.status(403).json({ error: "email already in use" });
+        if (result.length !== 0) {
+            return res.status(403).json({ error: "email already in use" });
+        }
 
         const salt = await bcrypt.genSalt();
         const hashedPassword = await bcrypt.hash(req.body.password, salt);
@@ -54,7 +57,9 @@ export const createUser = async (req: Request<any, any, postUser>, res: Response
         });
         res.status(201).json(loginPayload);
     } catch (err) {
-        res.status(500).json(err);
+        console.error(err);
+        const errMessage = getErrorMessage(err);
+        return res.status(500).json({ error: errMessage });
     }
 };
 
@@ -151,7 +156,7 @@ export const handleEmailSent = async (req: Request<any, any, HandleUserEmail>, r
 
         // send the email to the user with resend.
         const { data, error } = await resend.emails.send({
-            from: "Acme <webhook@eduartepaiva.com>",
+            from: "Webhook Tester <webhook@eduartepaiva.com>",
             to: [req.body.email],
             subject: "webhook email confirmation",
             html: emailHtml,

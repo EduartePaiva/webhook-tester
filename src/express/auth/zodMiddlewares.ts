@@ -76,10 +76,11 @@ export const validatePostUserMiddleware = (req: Request, res: Response, next: Ne
 
 export type loginUser = z.infer<typeof loginUser>;
 export const validateLoginUserMiddleware = (req: Request, res: Response, next: NextFunction) => {
-    try {
-        res.req.body = loginUser.parse(req.body);
-        return next();
-    } catch (error) {
-        return res.status(400).json(error);
+    // todo: use sageParse in others things
+    const zodResult = loginUser.safeParse(req.body);
+    if (!zodResult.success) {
+        return res.status(400).json({ error: zodResult.error.message });
     }
+    res.req.body = zodResult.data;
+    return next();
 };

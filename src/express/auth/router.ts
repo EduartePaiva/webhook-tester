@@ -11,7 +11,7 @@ const authRouter = Router();
 // /auth
 if (process.env.ACCEPT_NEW_USERS === "yes") {
     authRouter.post("/create", validatePostUserMiddleware, createUser);
-    authRouter.post("/confirm-email", handleUserEmailMiddleware, handleEmailSent);
+    authRouter.post("/send-email", handleUserEmailMiddleware, handleEmailSent);
 }
 // /auth/login
 authRouter.post("/login", validateLoginUserMiddleware, loginUser);
