@@ -1,6 +1,11 @@
 import bcrypt from "bcrypt";
 import { Request, Response } from "express";
-import { HandleUserEmail, loginUser as loginUserReqType, postUser } from "./zodMiddlewares";
+import {
+    handleUserEmail,
+    HandleUserEmail,
+    loginUser as loginUserReqType,
+    postUser,
+} from "./zodMiddlewares";
 import { db } from "../../db/drizzle_db";
 import { users } from "../../db/drizzle_schema/schema";
 import { eq } from "drizzle-orm";
@@ -14,13 +19,20 @@ const resend = new Resend(process.env.RESEND_API_TOKEN);
 
 export const createUser = async (req: Request<any, any, postUser>, res: Response) => {
     try {
+        const emailResult = handleUserEmail.safeParse(
+            jwt.verify(req.body.token, process.env.EMAIL_TOKEN_SECRET),
+        );
+        if (!emailResult.success) {
+            return res.sendStatus(400).json({ error: emailResult.error.message });
+        }
+        const email = emailResult.data.email.toLowerCase();
         const result = await db
             .select({
                 id: users.id,
             })
             .from(users)
-            .where(eq(users.email, req.body.email.toLowerCase()));
-        if (result.length !== 0) return res.status(403).json("email already in use");
+            .where(eq(users.email, email));
+        if (result.length !== 0) return res.status(403).json({ error: "email already in use" });
 
         const salt = await bcrypt.genSalt();
         const hashedPassword = await bcrypt.hash(req.body.password, salt);
@@ -28,13 +40,19 @@ export const createUser = async (req: Request<any, any, postUser>, res: Response
         const insert_res = await db
             .insert(users)
             .values({
-                email: req.body.email.toLowerCase(),
+                email,
                 userName: req.body.userName,
                 password: hashedPassword,
             })
             .returning();
-        // todo, save user in the database and confirm user email
-        res.status(201).json("user created");
+
+        // now I have to return a token like in login
+        const loginPayload = generateLoginPayload({
+            userEmail: email,
+            userId: insert_res[0].id,
+            userName: req.body.userName,
+        });
+        res.status(201).json(loginPayload);
     } catch (err) {
         res.status(500).json(err);
     }
@@ -46,6 +64,33 @@ export type accessTokenType = {
     name: string;
     expirationDate: number;
 };
+
+type loginPayload = {
+    accessToken: string;
+    webhookURL: string;
+    userName: string;
+    expirationDate: number;
+};
+
+function generateLoginPayload(data: {
+    userId: string;
+    userName: string;
+    userEmail: string;
+}): loginPayload {
+    const expirationDate = Date.now() + ONE_DAY_IN_MILLISECONDS;
+    const accessToken = jwt.sign(
+        {
+            id: data.userId,
+            name: data.userName,
+            email: data.userEmail,
+            expirationDate,
+        } satisfies accessTokenType,
+        process.env.ACCESS_TOKEN_SECRET,
+    );
+    // todo hard coded url
+    const webhookURL = `https://webhook.eduartepaiva.com/${data.userId}`;
+    return { accessToken, expirationDate, userName: data.userName, webhookURL };
+}
 
 export const loginUser = async (req: Request<any, any, loginUserReqType>, res: Response) => {
     try {
@@ -63,25 +108,12 @@ export const loginUser = async (req: Request<any, any, loginUserReqType>, res: R
             return;
         }
         // generate jwt token
-        const expirationDate = Date.now() + ONE_DAY_IN_MILLISECONDS;
-
-        const accessToken = jwt.sign(
-            {
-                id: user[0].id,
-                name: user[0].userName,
-                email: req.body.email.toLowerCase(),
-                expirationDate,
-            } satisfies accessTokenType,
-            process.env.ACCESS_TOKEN_SECRET,
-        );
-        // todo hard coded url
-        const webhookURL = `https://webhook.eduartepaiva.com/${user[0].id}`;
-        res.status(201).json({
-            accessToken,
-            webhookURL,
+        const loginPayload = generateLoginPayload({
+            userEmail: req.body.email,
+            userId: user[0].id,
             userName: user[0].userName,
-            expirationDate,
         });
+        res.status(201).json(loginPayload);
     } catch (err) {
         return res.status(500).json(err);
     }

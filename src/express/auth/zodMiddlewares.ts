@@ -6,7 +6,7 @@ const createUser = z.object({
         .string()
         .min(3, "user name should be at least 3 characters long")
         .max(20, "user name should be at max 20 characters long"),
-    email: z.string().email("invalid email"),
+    token: z.string(),
     password: z.string().superRefine((val, ctx) => {
         if (val.length < 8) {
             ctx.addIssue({
@@ -51,7 +51,7 @@ const loginUser = z.object({
     password: z.string(),
 });
 
-const handleUserEmail = z.object({
+export const handleUserEmail = z.object({
     email: z.string().email("invalid email"),
 });
 export type HandleUserEmail = z.infer<typeof handleUserEmail>;
