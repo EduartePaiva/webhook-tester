@@ -4,6 +4,8 @@ import { config } from "dotenv";
 //this is for pm2
 import path from "path";
 config({ path: path.join(__dirname, ".env") });
+import { initEverything } from "./validateEnvVariables";
+initEverything();
 
 //-----
 import jwt from "jsonwebtoken";
@@ -12,9 +14,6 @@ import { Server } from "socket.io";
 import app from "./express";
 import { Request } from "express";
 import { ClientToServerEvents, InterServerEvents, ServerToClientEvents, SocketData } from "./types";
-import { initEverything } from "./validateEnvVariables";
-
-initEverything();
 
 const PORT = 3000;
 
