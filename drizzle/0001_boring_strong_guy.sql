@@ -4,8 +4,6 @@ CREATE TABLE IF NOT EXISTS "reset_password" (
 	"expire_at" timestamp NOT NULL
 );
 --> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "reset_password" ADD CONSTRAINT "reset_password_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE cascade;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
+
+ALTER TABLE "reset_password" ADD CONSTRAINT "reset_password_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE cascade;
+
