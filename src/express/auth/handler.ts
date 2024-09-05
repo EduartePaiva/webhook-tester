@@ -13,6 +13,7 @@ import jwt from "jsonwebtoken";
 import { generateEmailTemplate } from "./emailTemplate";
 import { Resend } from "resend";
 import { getErrorMessage } from "../../lib/utils";
+import { AuthenticateUserData } from "./isAuthenticatedMiddleware";
 
 const ONE_DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000;
 const ONE_DAY_IN_SECONDS = 24 * 60 * 60;
@@ -174,3 +175,8 @@ export const handleEmailSent = async (req: Request<any, any, HandleUserEmail>, r
         return res.status(500).json({ error: "internal server error" });
     }
 };
+
+export const handleChangePassword = async (
+    req: Request<any, any, AuthenticateUserData>,
+    res: Response,
+) => {};

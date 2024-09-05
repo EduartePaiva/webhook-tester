@@ -2,6 +2,10 @@ import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { SocketData } from "../../types";
 
+export type AuthenticateUserData = {
+    user: SocketData;
+};
+
 /**
  * The authenticate sets the req.body.user to @type{SocketData}
  */

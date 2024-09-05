@@ -8,6 +8,13 @@
       "when": 1719423736470,
       "tag": "0000_thin_thanos",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1725549683863,
+      "tag": "0001_boring_strong_guy",
+      "breakpoints": true
     }
   ]
 }

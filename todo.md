@@ -19,4 +19,6 @@
 [x] - create a real db to host the database. CockroachDB db
 [x] - test if the email will be sent.
 [x] - remake the create user logic, it'll receive a jwt token that it's the email, the password and username and then will decrypt the token and create a user if the token is valid, it have to check if user is already created too.
-[_] - deploy the updated version to see if everything works.
+[x] - deploy the updated version to see if everything works.
+[_] - develop the reset password.
+[_] - create a new db table
