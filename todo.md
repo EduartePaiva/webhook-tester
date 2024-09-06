@@ -21,4 +21,5 @@
 [x] - remake the create user logic, it'll receive a jwt token that it's the email, the password and username and then will decrypt the token and create a user if the token is valid, it have to check if user is already created too.
 [x] - deploy the updated version to see if everything works.
 [_] - develop the reset password.
-[_] - create a new db table
+[x] - create a new db table.
+[_] make and update the email template for reset password
