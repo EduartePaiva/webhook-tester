@@ -7,8 +7,8 @@ import {
     postUser,
 } from "./zodMiddlewares";
 import { db } from "../../db/drizzle_db";
-import { users } from "../../db/drizzle_schema/schema";
-import { eq } from "drizzle-orm";
+import { resetPassword, users } from "../../db/drizzle_schema/schema";
+import { eq, lt } from "drizzle-orm";
 import jwt from "jsonwebtoken";
 import { generateEmailTemplate } from "./emailTemplate";
 import { Resend } from "resend";
@@ -17,6 +17,7 @@ import { AuthenticateUserData } from "./isAuthenticatedMiddleware";
 
 const ONE_DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000;
 const ONE_DAY_IN_SECONDS = 24 * 60 * 60;
+const ONE_HOUR_IN_MILLISECONDS = 60 * 60 * 1000;
 const resend = new Resend(process.env.RESEND_API_TOKEN);
 
 export const createUser = async (req: Request<any, any, postUser>, res: Response) => {
@@ -179,4 +180,46 @@ export const handleEmailSent = async (req: Request<any, any, HandleUserEmail>, r
 export const handleChangePassword = async (
     req: Request<any, any, AuthenticateUserData>,
     res: Response,
-) => {};
+) => {
+    try {
+        // delete expired at the dp
+        const delPromise = db.delete(resetPassword).where(lt(resetPassword.expireAt, new Date()));
+        // create a token with the id of the the insertion of resetPassword
+        const expirationDate = new Date(Date.now() + ONE_HOUR_IN_MILLISECONDS);
+
+        const resetId = await db
+            .insert(resetPassword)
+            .values({
+                userId: req.body.user.id,
+                expireAt: expirationDate,
+            })
+            .returning({ id: resetPassword.id });
+        if (resetId.length !== 1) {
+            return res.status(400).json({ error: "database error" });
+        }
+        // this token contains the id of a row in the resetPassword table
+        const resetToken = jwt.sign(
+            { resetId: resetId[0].id, exp: Math.floor(expirationDate.getTime() / 1000) },
+            process.env.EMAIL_TOKEN_SECRET,
+        );
+
+        // send the email to the user with resend.
+        const url = new URL(`${process.env.WEBSITE_URL}/complete-change-pw`);
+        url.searchParams.set("token", resetToken);
+
+        // this template needs to be a template for change password
+        //const emailHtml = generateEmailTemplate(url.toString());
+
+        const { data, error } = await resend.emails.send({
+            from: "Webhook Tester <webhook@eduartepaiva.com>",
+            to: [req.body.user.email],
+            subject: "webhook email confirmation",
+            html: "emailHtml",
+        });
+
+        if (error) {
+            console.error(error);
+            return res.status(400).json({ error });
+        }
+    } catch (err) {}
+};
