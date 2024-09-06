@@ -1,5 +1,5 @@
 import { Router } from "express";
-import authenticate from "../auth/isAuthenticatedMiddleware";
+import { authenticate } from "../auth/isAuthenticatedMiddleware";
 import { getWebhookUrl } from "./handler";
 
 const webhookUrlRouter = Router();

@@ -210,16 +210,23 @@ export const handleChangePassword = async (
         // this template needs to be a template for change password
         //const emailHtml = generateEmailTemplate(url.toString());
 
-        const { data, error } = await resend.emails.send({
+        const { error } = await resend.emails.send({
             from: "Webhook Tester <webhook@eduartepaiva.com>",
             to: [req.body.user.email],
-            subject: "webhook email confirmation",
+            subject: "webhook password reset",
             html: "emailHtml",
         });
 
         if (error) {
             console.error(error);
-            return res.status(400).json({ error });
+            return res.status(400).json({ error: error.message });
         }
-    } catch (err) {}
+        res.sendStatus(200);
+    } catch (err) {
+        console.log(err);
+        if (err instanceof Error) {
+            return res.status(500).json({ error: err.message });
+        }
+        return res.status(500).json({ error: "internal server error" });
+    }
 };
