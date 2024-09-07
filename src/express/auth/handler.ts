@@ -10,7 +10,7 @@ import { db } from "../../db/drizzle_db";
 import { resetPassword, users } from "../../db/drizzle_schema/schema";
 import { eq, lt } from "drizzle-orm";
 import jwt from "jsonwebtoken";
-import { generateEmailTemplate } from "./emailTemplate";
+import { generateEmailTemplateResetPassword, generateEmailTemplateSignUp } from "./emailTemplate";
 import { Resend } from "resend";
 import { getErrorMessage } from "../../lib/utils";
 import { AuthenticateUserData } from "./isAuthenticatedMiddleware";
@@ -154,7 +154,7 @@ export const handleEmailSent = async (req: Request<any, any, HandleUserEmail>, r
         );
         const url = new URL("https://webhook.eduartepaiva.com/complete-signup");
         url.searchParams.set("token", emailToken);
-        const emailHtml = generateEmailTemplate(url.toString());
+        const emailHtml = generateEmailTemplateSignUp(url.toString());
 
         // send the email to the user with resend.
         const { data, error } = await resend.emails.send({
@@ -183,7 +183,7 @@ export const handleChangePassword = async (
 ) => {
     try {
         // delete expired at the dp
-        const delPromise = db.delete(resetPassword).where(lt(resetPassword.expireAt, new Date()));
+        db.delete(resetPassword).where(lt(resetPassword.expireAt, new Date()));
         // create a token with the id of the the insertion of resetPassword
         const expirationDate = new Date(Date.now() + ONE_HOUR_IN_MILLISECONDS);
 
@@ -204,17 +204,17 @@ export const handleChangePassword = async (
         );
 
         // send the email to the user with resend.
-        const url = new URL(`${process.env.WEBSITE_URL}/complete-change-pw`);
+        const url = new URL(`${process.env.WEBSITE_URL}/reset-password`);
         url.searchParams.set("token", resetToken);
 
         // this template needs to be a template for change password
-        //const emailHtml = generateEmailTemplate(url.toString());
+        const emailHtml = generateEmailTemplateResetPassword(url.toString());
 
         const { error } = await resend.emails.send({
             from: "Webhook Tester <webhook@eduartepaiva.com>",
             to: [req.body.user.email],
             subject: "webhook password reset",
-            html: "emailHtml",
+            html: emailHtml,
         });
 
         if (error) {

@@ -16,7 +16,7 @@ if (process.env.ACCEPT_NEW_USERS === "yes") {
 }
 
 // /auth/reset-password -> this part is for sending the token to the email
-authRouter.get("/change-password", handleAuthenticateResetPassword, handleChangePassword);
+authRouter.post("/change-password", handleAuthenticateResetPassword, handleChangePassword);
 
 //authRouter.get("/complete-change-pw", authenticate);
 
