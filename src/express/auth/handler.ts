@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import { Request, Response } from "express";
 import {
+    confirmChangePasswordData,
     handleUserEmail,
     HandleUserEmail,
     loginUser as loginUserReqType,
@@ -14,11 +15,18 @@ import { generateEmailTemplateResetPassword, generateEmailTemplateSignUp } from 
 import { Resend } from "resend";
 import { getErrorMessage } from "../../lib/utils";
 import { AuthenticateUserData } from "./isAuthenticatedMiddleware";
+import { resetPasswordToken } from "./zodDefinitions";
 
 const ONE_DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000;
 const ONE_DAY_IN_SECONDS = 24 * 60 * 60;
 const ONE_HOUR_IN_MILLISECONDS = 60 * 60 * 1000;
 const resend = new Resend(process.env.RESEND_API_TOKEN);
+
+async function hashPassword(password: string): Promise<string> {
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(password, salt);
+    return hashedPassword;
+}
 
 export const createUser = async (req: Request<any, any, postUser>, res: Response) => {
     try {
@@ -38,16 +46,12 @@ export const createUser = async (req: Request<any, any, postUser>, res: Response
         if (result.length !== 0) {
             return res.status(403).json({ error: "email already in use" });
         }
-
-        const salt = await bcrypt.genSalt();
-        const hashedPassword = await bcrypt.hash(req.body.password, salt);
-
         const insert_res = await db
             .insert(users)
             .values({
                 email,
                 userName: req.body.userName,
-                password: hashedPassword,
+                password: await hashPassword(req.body.password),
             })
             .returning();
 
@@ -183,7 +187,7 @@ export const handleChangePassword = async (
 ) => {
     try {
         // delete expired at the dp
-        db.delete(resetPassword).where(lt(resetPassword.expireAt, new Date()));
+        const promise1 = db.delete(resetPassword).where(lt(resetPassword.expireAt, new Date()));
         // create a token with the id of the the insertion of resetPassword
         const expirationDate = new Date(Date.now() + ONE_HOUR_IN_MILLISECONDS);
 
@@ -221,9 +225,55 @@ export const handleChangePassword = async (
             console.error(error);
             return res.status(400).json({ error: error.message });
         }
+
+        await promise1;
         res.sendStatus(200);
     } catch (err) {
         console.log(err);
+        if (err instanceof Error) {
+            return res.status(500).json({ error: err.message });
+        }
+        return res.status(500).json({ error: "internal server error" });
+    }
+};
+
+export const handleConfirmChangePassword = async (
+    req: Request<any, any, confirmChangePasswordData>,
+    res: Response,
+) => {
+    // this needs the token and the new password
+    try {
+        // get token that it's the id of the changePassword row
+        const jwtData = jwt.verify(req.body.token, process.env.EMAIL_TOKEN_SECRET);
+        const tokenData = resetPasswordToken.safeParse(jwtData);
+        if (!tokenData.success) {
+            return res.status(400).json({ error: "Invalid token" });
+        }
+
+        // delete the specific
+        const delResult = await db
+            .delete(resetPassword)
+            .where(eq(resetPassword.id, tokenData.data.resetId))
+            .returning();
+
+        if (delResult.length !== 1) {
+            return res.status(400).json({ error: "token already used." });
+        }
+        // delete all tokens that is from that user
+        const promise1 = db
+            .delete(resetPassword)
+            .where(eq(resetPassword.userId, delResult[0].userId));
+
+        // update the user password, need hash the password.
+        await db
+            .update(users)
+            .set({ password: await hashPassword(req.body.password) })
+            .where(eq(users.id, delResult[0].userId));
+
+        await promise1;
+
+        res.sendStatus(200);
+    } catch (err) {
         if (err instanceof Error) {
             return res.status(500).json({ error: err.message });
         }

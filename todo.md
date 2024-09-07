@@ -22,4 +22,4 @@
 [x] - deploy the updated version to see if everything works.
 [_] - develop the reset password.
 [x] - create a new db table.
-[_] make and update the email template for reset password
+[x] make and update the email template for reset password
