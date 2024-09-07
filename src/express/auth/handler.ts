@@ -265,14 +265,23 @@ export const handleConfirmChangePassword = async (
             .where(eq(resetPassword.userId, delResult[0].userId));
 
         // update the user password, need hash the password.
-        await db
+        const userUpdated = await db
             .update(users)
             .set({ password: await hashPassword(req.body.password) })
-            .where(eq(users.id, delResult[0].userId));
+            .where(eq(users.id, delResult[0].userId))
+            .returning();
+        if (userUpdated.length !== 1) {
+            return res.status(500).json({ error: "database error" });
+        }
 
         await promise1;
-
-        res.sendStatus(200);
+        // generate jwt token
+        const loginPayload = generateLoginPayload({
+            userEmail: userUpdated[0].email,
+            userId: userUpdated[0].id,
+            userName: userUpdated[0].userName,
+        });
+        res.status(201).json(loginPayload);
     } catch (err) {
         if (err instanceof Error) {
             return res.status(500).json({ error: err.message });
