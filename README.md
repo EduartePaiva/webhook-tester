@@ -39,7 +39,7 @@ For example:
 
 ### Here is a visual diagram of how it works:
 
-![workflow diagram](readme_assets/diagram-webhook-workflow.pnga)
+![workflow diagram](readme_assets/diagram-webhook-workflow.png)
 
 ## Installation
 
