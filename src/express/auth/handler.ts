@@ -98,8 +98,7 @@ function generateLoginPayload(data: {
         } satisfies accessTokenType,
         process.env.ACCESS_TOKEN_SECRET,
     );
-    // todo hard coded url
-    const webhookURL = `https://webhook.eduartepaiva.com/${data.userId}`;
+    const webhookURL = `${process.env.WEBHOOK_URL}/${data.userId}`;
     return { accessToken, expirationDate, userName: data.userName, webhookURL };
 }
 

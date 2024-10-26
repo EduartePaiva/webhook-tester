@@ -8,6 +8,7 @@ const envScheme = z.object({
     RESEND_API_TOKEN: z.string().min(1),
     ALLOW_CORS: z.string().optional(),
     WEBSITE_URL: z.string().min(1),
+    WEBHOOK_URL: z.string().min(4),
 });
 
 export type envSchemaType = z.infer<typeof envScheme>;
