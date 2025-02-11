@@ -133,7 +133,7 @@ export const handleEmailSent = async (req: Request<any, any, HandleUserEmail>, r
     // req.body.email
     // what do I have to do here?
     // cryptograph the email in a jwt
-    // create a link like: https://webhook.eduartepaiva.com/complete-signup?token=cryptedemail
+    // create a link like: https://webhook.eduarte.pro/complete-signup?token=cryptedemail
     // in the frontend the user will access this link and
 
     // before everything check if email already exists.
@@ -155,13 +155,13 @@ export const handleEmailSent = async (req: Request<any, any, HandleUserEmail>, r
             process.env.EMAIL_TOKEN_SECRET,
             { expiresIn: ONE_DAY_IN_SECONDS },
         );
-        const url = new URL("https://webhook.eduartepaiva.com/complete-signup");
+        const url = new URL(`${process.env.WEBSITE_URL}/complete-signup`);
         url.searchParams.set("token", emailToken);
         const emailHtml = generateEmailTemplateSignUp(url.toString());
 
         // send the email to the user with resend.
         const { data, error } = await resend.emails.send({
-            from: "Webhook Tester <webhook@eduartepaiva.com>",
+            from: "Webhook Tester <webhook@eduarte.pro>",
             to: [req.body.email],
             subject: "webhook email confirmation",
             html: emailHtml,
@@ -214,7 +214,7 @@ export const handleChangePassword = async (
         const emailHtml = generateEmailTemplateResetPassword(url.toString());
 
         const { error } = await resend.emails.send({
-            from: "Webhook Tester <webhook@eduartepaiva.com>",
+            from: "Webhook Tester <webhook@eduarte.pro>",
             to: [req.body.user.email],
             subject: "webhook password reset",
             html: emailHtml,

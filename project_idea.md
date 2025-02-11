@@ -1,6 +1,6 @@
 Criar um app para auxiliar em testes de webhook no localhost.
 
-O app no server site vai rodar no site webhook.eduartepaiva.com.
+O app no server site vai rodar no site webhook.eduarte.pro.
 
 vai receber requests de sites permitidos, como replicate ia ou stripe.vai .  
 Não vai mais precisar disto, cara usuário vai possuir um uuid.
@@ -12,7 +12,7 @@ ideias:javascript - How can i listen for http requests on a client side - Stack 
 
 e webhook site.
 coisas que preciso fazer:
-um app cli que permite o firewall receber de webhook.eduartepaiva.com
+um app cli que permite o firewall receber de webhook.eduarte.pro
 um backend que vai ouvir webhooks e enviar mensagem para .
 vai ser em golang
 
